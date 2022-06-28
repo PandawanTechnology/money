@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PandawanTechnology\Money\Calculator;
 
+use PandawanTechnology\Money\Exception\CurrencyMismatchException;
+use PandawanTechnology\Money\Exception\DivisionByZeroException;
 use PandawanTechnology\Money\Model\Money;
-use PandawanTechnology\Bundle\MoneyBundle\Exception\CurrencyMismatchException;
-use PandawanTechnology\Bundle\MoneyBundle\Exception\DivisionByZeroException;
 
 interface CalculatorInterface
 {
