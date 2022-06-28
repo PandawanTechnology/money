@@ -19,6 +19,9 @@ class CurrencyManager
     ) {
     }
 
+    /**
+     * @return string[] The allowed currency codes
+     */
     public function getAllowedCurrencyCodes(): array
     {
         $this->initCurrenciesConfigurations();
