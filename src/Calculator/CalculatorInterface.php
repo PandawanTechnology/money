@@ -37,6 +37,10 @@ interface CalculatorInterface
      */
     public function mod(Money $money, Money $divisor): Money;
 
+    public function share(Money $money, string $ratio, string $total): Money;
+
+    public function floor(Money $money): Money;
+
     /**
      * @param int[] $ratios
      *

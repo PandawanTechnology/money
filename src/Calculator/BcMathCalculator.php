@@ -103,17 +103,53 @@ class BcMathCalculator implements CalculatorInterface
     /**
      * @inheritDoc
      */
-    public function mod(Money $money, Money $divisor): Money
-    {
-        // TODO: Implement mod() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function allocate(Money $money, array $ratios): array
     {
-        // TODO: Implement allocate() method.
+        $remainder = $money->getAmount();
+        $currency = $money->getCurrency();
+
+        $results   = [];
+        $total     = array_sum($ratios);
+
+        if ($total <= 0) {
+            throw new \InvalidArgumentException('Cannot allocate to none, sum of ratios must be greater than zero');
+        }
+
+        foreach ($ratios as $key => $ratio) {
+            if ($ratio < 0) {
+                throw new \InvalidArgumentException('Cannot allocate to none, ratio must be zero or positive');
+            }
+
+            $share = $this->share($money, (string) $ratio, (string) $total);
+            $results[$key] = $share;
+            $remainder     = $this->subtract($remainder, $share);
+        }
+
+        if ($this->comparator->isZero($remainder)) {
+            return $results;
+        }
+
+        $amount = $money->getAmount();
+        $fractions = array_map(static function (float|int $ratio) use ($total, $amount) {
+            $share = (float) $ratio / $total * (float) $amount;
+
+            return $share - floor($share);
+        }, $ratios);
+
+        while (!$this->comparator->isZero($remainder)) {
+            $index = $fractions !== [] ? array_keys($fractions, max($fractions))[0] : 0;
+            $results[$index] = $this->moneyFactory->createMoney(
+                $this->add($results[$index], $this->moneyFactory->createMoney('1', $currency))->getAmount(),
+                $results[$index]->getCurrency()
+            );
+            $remainder = $this->subtract(
+                $this->moneyFactory->createMoney($remainder, $currency),
+                $this->moneyFactory->createMoney('1', $currency)
+            );
+            unset($fractions[$index]);
+        }
+
+        return $results;
     }
 
     /**
@@ -121,15 +157,28 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function allocateTo(Money $money, int $n): array
     {
-        // TODO: Implement allocateTo() method.
+        return $this->allocate($money, array_fill(0, $n, 1));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function ratioOf(Money $money): string
+    public function share(Money $money, string $ratio, string $total): Money
     {
-        // TODO: Implement ratioOf() method.
+        return $this->floor(
+            $this->moneyFactory->createMoney(
+                bcdiv(bcmul($money->getAmount(), $ratio), $total),
+                $money->getCurrency()
+            )
+        );
+    }
+
+    public function floor(Money $money): Money
+    {
+        $currency = $money->getCurrency();
+
+        if ($this->comparator->isNegative($money)) {
+            return $this->add($money, $this->moneyFactory->createMoney('-1', $currency));
+        }
+
+        return $this->add($money, $this->moneyFactory->createMoney(0, $currency));
     }
 
     /**
@@ -137,15 +186,9 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function absolute(Money $money): Money
     {
-        // TODO: Implement absolute() method.
-    }
+        $newAmount = ltrim($money->getAmount(), '-');
 
-    /**
-     * @inheritDoc
-     */
-    public function negative(Money $money): Money
-    {
-        // TODO: Implement negative() method.
+        return $this->moneyFactory->createMoney($newAmount, $money->getCurrency());
     }
 
     /**
@@ -153,7 +196,17 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function getMin(Money $first, Money ...$collection): Money
     {
-        // TODO: Implement getMin() method.
+        $min = $first;
+
+        foreach ($collection as $money) {
+            if (!$this->comparator->lessThan($money, $min)) {
+                continue;
+            }
+
+            $min = $money;
+        }
+
+        return $min;
     }
 
     /**
@@ -161,7 +214,17 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function getMax(Money $first, Money ...$collection): Money
     {
-        // TODO: Implement getMax() method.
+        $max = $first;
+
+        foreach ($collection as $money) {
+            if (!$this->comparator->greaterThan($money, $max)) {
+                continue;
+            }
+
+            $max = $money;
+        }
+
+        return $max;
     }
 
     /**
@@ -169,7 +232,7 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function sum(Money $first, Money ...$collection): Money
     {
-        // TODO: Implement sum() method.
+        return $this->add($first, ...$collection);
     }
 
     /**
@@ -177,6 +240,42 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function average(Money $first, Money ...$collection): Money
     {
-        // TODO: Implement average() method.
+        return $this->divide(
+            $this->sum($first, ...$collection),
+            count($collection) + 1
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function negative(Money $money): Money
+    {
+        return $this->subtract(
+            $this->moneyFactory->createMoney(0, $money->getCurrency()),
+            $money
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function mod(Money $money, Money $divisor): Money
+    {
+        if ($this->comparator->isZero($divisor)) {
+            throw new \InvalidArgumentException('Modulo cannot be zero');
+        }
+
+        return $this->moneyFactory->createMoney(
+            bcmod($money->getAmount(), $divisor->getAmount()) ?? '0',
+            $money->getCurrency()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function ratioOf(Money $money): string
+    {
     }
 }
