@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PandawanTechnology\Money\Comparator;
 
+use PandawanTechnology\Money\Calculator\CalculatorInterface;
 use PandawanTechnology\Money\Model\Money;
 
 class BcMathComparator extends AbstractComparator
@@ -13,7 +14,7 @@ class BcMathComparator extends AbstractComparator
      */
     public function isZero(Money $money): bool
     {
-        return 0 === bccomp('0', $money->getAmount());
+        return 0 === bccomp('0', $money->getAmount(), CalculatorInterface::PRECISION);
     }
 
     /**
@@ -21,7 +22,7 @@ class BcMathComparator extends AbstractComparator
      */
     public function isNegative(Money $money): bool
     {
-        return -1 === bccomp($money->getAmount(), '0');
+        return -1 === bccomp($money->getAmount(), '0', CalculatorInterface::PRECISION);
     }
 
     /**
@@ -41,7 +42,7 @@ class BcMathComparator extends AbstractComparator
             return false;
         }
 
-        return 0 === bccomp($first->getAmount(), $challenge->getAmount());
+        return 0 === bccomp($first->getAmount(), $challenge->getAmount(), CalculatorInterface::PRECISION);
     }
     /**
      * Checks whether the value represented by this object is greater than the other.
@@ -52,7 +53,7 @@ class BcMathComparator extends AbstractComparator
             return false;
         }
 
-        return 1 === bccomp($first->getAmount(), $challenge->getAmount());
+        return 1 === bccomp($first->getAmount(), $challenge->getAmount(), CalculatorInterface::PRECISION);
     }
 
     public function greaterThanOrEqual(Money $first, Money $challenge): bool
@@ -69,7 +70,7 @@ class BcMathComparator extends AbstractComparator
             return false;
         }
 
-        return -1 === bccomp($first->getAmount(), $challenge->getAmount());
+        return -1 === bccomp($first->getAmount(), $challenge->getAmount(), CalculatorInterface::PRECISION);
     }
 
     public function lessThanOrEqual(Money $first, Money $challenge): bool

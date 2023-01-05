@@ -26,8 +26,6 @@ class BcMathCalculator implements CalculatorInterface
     public function add(Money $first, Money ...$addends): Money
     {
         $result = clone $first;
-        $referenceCurrencyCode = $first->getCurrency();
-        $currencyPrecision = $this->currencyManager->getCurrencyPrecision($referenceCurrencyCode);
 
         while ($addend = array_shift($addends)) {
             if (!$this->comparator->isSameCurrency($first, $addend)) {
@@ -35,8 +33,8 @@ class BcMathCalculator implements CalculatorInterface
             }
 
             $result = $this->moneyFactory->createMoney(
-                bcadd($result->getAmount(), $addend->getAmount(), $currencyPrecision),
-                $referenceCurrencyCode
+                bcadd($result->getAmount(), $addend->getAmount(), CalculatorInterface::PRECISION),
+                $first->getCurrency()
             );
         }
 
@@ -49,8 +47,6 @@ class BcMathCalculator implements CalculatorInterface
     public function subtract(Money $first, Money ...$addends): Money
     {
         $result = clone $first;
-        $referenceCurrencyCode = $first->getCurrency();
-        $currencyPrecision = $this->currencyManager->getCurrencyPrecision($referenceCurrencyCode);
 
         while ($addend = array_shift($addends)) {
             if (!$this->comparator->isSameCurrency($first, $addend)) {
@@ -58,8 +54,8 @@ class BcMathCalculator implements CalculatorInterface
             }
 
             $result = $this->moneyFactory->createMoney(
-                bcsub($result->getAmount(), $addend->getAmount(), $currencyPrecision),
-                $referenceCurrencyCode
+                bcsub($result->getAmount(), $addend->getAmount(), CalculatorInterface::PRECISION),
+                $first->getCurrency()
             );
         }
 
@@ -71,12 +67,9 @@ class BcMathCalculator implements CalculatorInterface
      */
     public function multiply(Money $money, int|string|float $multiplier): Money
     {
-        $currencyCode = $money->getCurrency();
-        $currencyPrecision = $this->currencyManager->getCurrencyPrecision($currencyCode);
-
         return $this->moneyFactory->createMoney(
-            bcmul($money->getAmount(), (string) $multiplier, $currencyPrecision),
-            $currencyCode
+            bcmul($money->getAmount(), (string) $multiplier, CalculatorInterface::PRECISION),
+            $money->getCurrency()
         );
     }
 
@@ -91,12 +84,9 @@ class BcMathCalculator implements CalculatorInterface
             throw new DivisionByZeroException();
         }
 
-        $referenceCurrencyCode = $money->getCurrency();
-        $currencyPrecision = $this->currencyManager->getCurrencyPrecision($referenceCurrencyCode);
-
         return $this->moneyFactory->createMoney(
-            bcdiv($money->getAmount(), $divisor, $currencyPrecision),
-            $referenceCurrencyCode
+            bcdiv($money->getAmount(), $divisor, CalculatorInterface::PRECISION),
+            $money->getCurrency()
         );
     }
 
@@ -164,7 +154,7 @@ class BcMathCalculator implements CalculatorInterface
     {
         return $this->floor(
             $this->moneyFactory->createMoney(
-                bcdiv(bcmul($money->getAmount(), $ratio), $total),
+                bcdiv(bcmul($money->getAmount(), $ratio, CalculatorInterface::PRECISION), $total, CalculatorInterface::PRECISION),
                 $money->getCurrency()
             )
         );
@@ -267,7 +257,7 @@ class BcMathCalculator implements CalculatorInterface
         }
 
         return $this->moneyFactory->createMoney(
-            bcmod($money->getAmount(), $divisor->getAmount()) ?? '0',
+            bcmod($money->getAmount(), $divisor->getAmount(), CalculatorInterface::PRECISION) ?? '0',
             $money->getCurrency()
         );
     }

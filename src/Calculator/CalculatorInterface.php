@@ -10,6 +10,8 @@ use PandawanTechnology\Money\Model\Money;
 
 interface CalculatorInterface
 {
+    public const PRECISION = 5;
+
     /**
      * @throws CurrencyMismatchException
      */
