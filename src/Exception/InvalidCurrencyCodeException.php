@@ -7,7 +7,7 @@ namespace PandawanTechnology\Money\Exception;
 class InvalidCurrencyCodeException extends \OutOfRangeException
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __construct(
         string $submittedCurrencyCode,

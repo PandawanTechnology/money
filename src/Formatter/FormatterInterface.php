@@ -9,17 +9,17 @@ use PandawanTechnology\Money\Model\Money;
 interface FormatterInterface
 {
     /**
-     * Display the formatted numeric part of the Money object
+     * Display the formatted numeric part of the Money object.
      */
     public function formatAmount(Money $money, string $locale = null): string;
 
     /**
-     * Display the formatted numeric part of the Money object
+     * Display the formatted numeric part of the Money object.
      */
     public function asFloat(Money $money, string $locale = null): float;
 
     /**
-     * Display the real amount the Money object is representing
+     * Display the real amount the Money object is representing.
      */
     public function formatPrice(Money $money, string $locale = null): string;
 

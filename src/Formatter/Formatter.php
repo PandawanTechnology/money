@@ -24,7 +24,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function formatAmount(Money $money, string $locale = null): string
     {
@@ -33,7 +33,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function asFloat(Money $money, string $locale = null): float
     {
@@ -41,7 +41,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function formatPrice(Money $money, string $locale = null): string
     {
@@ -50,7 +50,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function formatCurrencySymbol(string $currencyCode, ?string $locale = null): string
     {

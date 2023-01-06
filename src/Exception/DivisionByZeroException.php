@@ -7,10 +7,10 @@ namespace PandawanTechnology\Money\Exception;
 class DivisionByZeroException extends \DomainException
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __construct(
-        string $message = "Division by 0",
+        string $message = 'Division by 0',
         int $code = 0,
         ?\Throwable $previous = null
     ) {

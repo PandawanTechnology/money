@@ -12,17 +12,12 @@ class CurrencyConfigurationsLoader implements CurrencyConfigurationsLoaderInterf
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getCurrenciesConfigurations(): array
     {
         if (!\is_readable($this->currenciesConfigurationsFilePath)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Currencies configurations\' file path "%s" is not readable',
-                    $this->currenciesConfigurationsFilePath
-                )
-            );
+            throw new \RuntimeException(sprintf('Currencies configurations\' file path "%s" is not readable', $this->currenciesConfigurationsFilePath));
         }
 
         return require $this->currenciesConfigurationsFilePath;

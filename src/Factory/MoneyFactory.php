@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PandawanTechnology\Money\Factory;
 
-use PandawanTechnology\Money\Model\Money;
 use PandawanTechnology\Money\Exception\InvalidCurrencyCodeException;
 use PandawanTechnology\Money\Manager\CurrencyManager;
+use PandawanTechnology\Money\Model\Money;
 
 class MoneyFactory
 {

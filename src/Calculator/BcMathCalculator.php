@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace PandawanTechnology\Money\Calculator;
 
 use PandawanTechnology\Money\Comparator\BcMathComparator;
-use PandawanTechnology\Money\Model\Money;
 use PandawanTechnology\Money\Exception\CurrencyMismatchException;
 use PandawanTechnology\Money\Exception\DivisionByZeroException;
 use PandawanTechnology\Money\Factory\MoneyFactory;
-use PandawanTechnology\Money\Manager\CurrencyManager;
+use PandawanTechnology\Money\Model\Money;
 
 class BcMathCalculator implements CalculatorInterface
 {
     public function __construct(
         private BcMathComparator $comparator,
-        private CurrencyManager $currencyManager,
         private MoneyFactory $moneyFactory,
     ) {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function add(Money $first, Money ...$addends): Money
     {
@@ -42,7 +40,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function subtract(Money $first, Money ...$addends): Money
     {
@@ -63,7 +61,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function multiply(Money $money, int|string|float $multiplier): Money
     {
@@ -74,7 +72,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function divide(Money $money, int|string|float $divisor): Money
     {
@@ -91,15 +89,15 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function allocate(Money $money, array $ratios): array
     {
-        $remainder = $money->getAmount();
+        $remainder = clone $money;
         $currency = $money->getCurrency();
 
-        $results   = [];
-        $total     = array_sum($ratios);
+        $results = [];
+        $total = array_sum($ratios);
 
         if ($total <= 0) {
             throw new \InvalidArgumentException('Cannot allocate to none, sum of ratios must be greater than zero');
@@ -112,10 +110,10 @@ class BcMathCalculator implements CalculatorInterface
 
             $share = $this->share($money, (string) $ratio, (string) $total);
             $results[$key] = $share;
-            $remainder     = $this->subtract($remainder, $share);
+            $remainder = $this->subtract($remainder, $share);
         }
 
-        if ($this->comparator->isZero($remainder)) {
+        if ($this->comparator->isZeroAmount($remainder)) {
             return $results;
         }
 
@@ -126,12 +124,9 @@ class BcMathCalculator implements CalculatorInterface
             return $share - floor($share);
         }, $ratios);
 
-        while (!$this->comparator->isZero($remainder)) {
-            $index = $fractions !== [] ? array_keys($fractions, max($fractions))[0] : 0;
-            $results[$index] = $this->moneyFactory->createMoney(
-                $this->add($results[$index], $this->moneyFactory->createMoney('1', $currency))->getAmount(),
-                $results[$index]->getCurrency()
-            );
+        while (!$this->comparator->isZeroAmount($remainder)) {
+            $index = [] !== $fractions ? array_keys($fractions, max($fractions))[0] : 0;
+            $results[$index] = $this->add($results[$index], $this->moneyFactory->createMoney('1', $currency));
             $remainder = $this->subtract(
                 $this->moneyFactory->createMoney($remainder, $currency),
                 $this->moneyFactory->createMoney('1', $currency)
@@ -143,7 +138,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function allocateTo(Money $money, int $n): array
     {
@@ -172,7 +167,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function absolute(Money $money): Money
     {
@@ -182,7 +177,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMin(Money $first, Money ...$collection): Money
     {
@@ -200,7 +195,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMax(Money $first, Money ...$collection): Money
     {
@@ -218,7 +213,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function sum(Money $first, Money ...$collection): Money
     {
@@ -226,7 +221,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function average(Money $first, Money ...$collection): Money
     {
@@ -237,7 +232,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function negative(Money $money): Money
     {
@@ -248,11 +243,11 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function mod(Money $money, Money $divisor): Money
     {
-        if ($this->comparator->isZero($divisor)) {
+        if ($this->comparator->isZeroAmount($divisor)) {
             throw new \InvalidArgumentException('Modulo cannot be zero');
         }
 
@@ -263,7 +258,7 @@ class BcMathCalculator implements CalculatorInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function ratioOf(Money $money): string
     {

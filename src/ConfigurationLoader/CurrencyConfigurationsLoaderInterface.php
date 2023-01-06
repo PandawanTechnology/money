@@ -15,7 +15,7 @@ interface CurrencyConfigurationsLoaderInterface
      *          'minorUnit' => (int),
      *          'numericCode' => (int),
      *      ]
-     * ]
+     * ].
      *
      * @see ../../currency.php
      */

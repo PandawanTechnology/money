@@ -9,16 +9,21 @@ use PandawanTechnology\Money\Model\Money;
 
 class BcMathComparator extends AbstractComparator
 {
-    /**
-     * @inheritDoc
-     */
-    public function isZero(Money $money): bool
+    public function isZero(int|string|float $input): bool
     {
-        return 0 === bccomp('0', $money->getAmount(), CalculatorInterface::PRECISION);
+        return 0 === bccomp('0', $input, CalculatorInterface::PRECISION);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     */
+    public function isZeroAmount(Money $money): bool
+    {
+        return $this->isZero($money->getAmount());
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function isNegative(Money $money): bool
     {
@@ -26,7 +31,7 @@ class BcMathComparator extends AbstractComparator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isPositive(Money $money): bool
     {
@@ -34,7 +39,7 @@ class BcMathComparator extends AbstractComparator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function equals(Money $first, Money $challenge): bool
     {
@@ -44,6 +49,7 @@ class BcMathComparator extends AbstractComparator
 
         return 0 === bccomp($first->getAmount(), $challenge->getAmount(), CalculatorInterface::PRECISION);
     }
+
     /**
      * Checks whether the value represented by this object is greater than the other.
      */

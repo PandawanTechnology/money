@@ -9,7 +9,7 @@ use PandawanTechnology\Money\Model\Money;
 abstract class AbstractComparator implements ComparatorInterface
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isSameCurrency(Money $first, Money ...$collection): bool
     {

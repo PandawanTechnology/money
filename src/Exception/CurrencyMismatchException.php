@@ -7,10 +7,10 @@ namespace PandawanTechnology\Money\Exception;
 class CurrencyMismatchException extends \InvalidArgumentException
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __construct(
-        string $message = "Currency does not match",
+        string $message = 'Currency does not match',
         int $code = 0,
         ?\Throwable $previous = null
     ) {

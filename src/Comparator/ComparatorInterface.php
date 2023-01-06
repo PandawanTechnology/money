@@ -8,7 +8,9 @@ use PandawanTechnology\Money\Model\Money;
 
 interface ComparatorInterface
 {
-    public function isZero(Money $money): bool;
+    public function isZero(int|string|float $input): bool;
+
+    public function isZeroAmount(Money $money): bool;
 
     public function isPositive(Money $money): bool;
 

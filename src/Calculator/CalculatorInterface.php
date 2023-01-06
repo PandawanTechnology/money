@@ -23,12 +23,12 @@ interface CalculatorInterface
     public function subtract(Money $first, Money ...$addends): Money;
 
     /**
-     * TODO handle rounding
+     * TODO handle rounding.
      */
     public function multiply(Money $money, int|string|float $multiplier): Money;
 
     /**
-     * TODO handle rounding
+     * TODO handle rounding.
      *
      * @throws DivisionByZeroException
      */

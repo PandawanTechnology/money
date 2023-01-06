@@ -22,6 +22,7 @@ class Money
     {
         return $this->currency;
     }
+
     public function setAmount(string $amount): self
     {
         $this->amount = $amount;
