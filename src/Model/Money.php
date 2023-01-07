@@ -25,15 +25,11 @@ class Money
 
     public function setAmount(string $amount): self
     {
-        $this->amount = $amount;
-
-        return $this;
+        return new self($amount, $this->currency);
     }
 
     public function setCurrency(string $currency): self
     {
-        $this->currency = $currency;
-
-        return $this;
+        return new self($this->amount, $currency);
     }
 }
