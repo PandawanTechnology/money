@@ -24,7 +24,6 @@ class BcMathCalculator implements CalculatorInterface
     public function add(Money $first, Money ...$addends): Money
     {
         $result = clone $first;
-
         while ($addend = array_shift($addends)) {
             if (!$this->comparator->isSameCurrency($first, $addend)) {
                 throw new CurrencyMismatchException();
@@ -128,7 +127,7 @@ class BcMathCalculator implements CalculatorInterface
             $index = [] !== $fractions ? array_keys($fractions, max($fractions))[0] : 0;
             $results[$index] = $this->add($results[$index], $this->moneyFactory->createMoney('1', $currency));
             $remainder = $this->subtract(
-                $this->moneyFactory->createMoney($remainder, $currency),
+                $remainder,
                 $this->moneyFactory->createMoney('1', $currency)
             );
             unset($fractions[$index]);
@@ -147,12 +146,12 @@ class BcMathCalculator implements CalculatorInterface
 
     public function share(Money $money, string $ratio, string $total): Money
     {
-        return $this->floor(
-            $this->moneyFactory->createMoney(
-                bcdiv(bcmul($money->getAmount(), $ratio, CalculatorInterface::PRECISION), $total, CalculatorInterface::PRECISION),
-                $money->getCurrency()
-            )
+        $rawResult = $this->divide(
+            $this->multiply($money, $ratio),
+            $total
         );
+
+        return $this->floor($rawResult);
     }
 
     public function floor(Money $money): Money

@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 class BcMathCalculatorTest extends TestCase
 {
+    private const DUMMY_CURRENCY = 'DUM';
+
     /**
      * @var BcMathCalculator
      */
@@ -180,6 +182,32 @@ class BcMathCalculatorTest extends TestCase
         $this->assertSame($expected, $this->calculator->divide($amount, $divisor));
     }
 
+    /**
+     * @dataProvider dataProviderAllocateTo
+     *
+     * @param string[] $expectedAmounts
+     */
+    public function testAllocateTo(string $amount, int $n, array $expectedAmounts): void
+    {
+        $money = new Money($amount, static::DUMMY_CURRENCY);
+
+        $expectedOutput = array_map(fn (string $expected) => new Money($expected, static::DUMMY_CURRENCY), $expectedAmounts);
+
+        $this->moneyFactory
+            ->expects($this->any())
+            ->method('createMoney')
+            ->willReturnCallback(fn ($amount, string $currency) => new Money($amount, $currency));
+
+        $this->comparator->expects($this->any())->method('isSameCurrency')->willReturn(true);
+        $this->comparator
+            ->expects($this->once())
+            ->method('isZeroAmount')
+            ->with($this->equalTo(new Money('0.00000', static::DUMMY_CURRENCY)))
+            ->willReturn(true);
+
+        $this->assertEquals($expectedOutput, $this->calculator->allocateTo($money, $n));
+    }
+
     public function dataProviderTestMultiply(): array
     {
         return [
@@ -189,6 +217,13 @@ class BcMathCalculatorTest extends TestCase
             [1],
             [1.0],
             [1.],
+        ];
+    }
+
+    public function dataProviderAllocateTo(): array
+    {
+        return [
+            ['12', 12, array_fill(0, 12, '1.00000')],
         ];
     }
 }
